@@ -8,7 +8,7 @@ class Gateio {
   private axios: AxiosInstance;
   private prefix: string;
 
-  constructor(private key: string, private secret: string) {
+  constructor(private key: string = "", private secret: string = "") {
     this.prefix = "/api/v4";
     this.axios = axios.create({
       baseURL: "https://api.gateio.ws",
@@ -144,7 +144,7 @@ class Gateio {
           etf_leverage: string;
         }[],
         typeof params
-      >({ method: "GET", endpoint: "/spot/currency_pairs", params }, [
+      >({ method: "GET", endpoint: "/spot/tickers", params }, [
         { key: "currency_pair" },
       ]);
     } catch (e) {
