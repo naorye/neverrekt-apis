@@ -9,28 +9,28 @@ async function api<Response, Params>(
   config: AxiosRequestConfig
 ) {
   const axiosReducer = {
-    async get() {
+    async GET() {
       try {
         return await axios.get<Response>(endpoint, { ...config, params });
       } catch (e) {
         throw e;
       }
     },
-    async put() {
+    async PUT() {
       try {
         return await axios.put<Response>(endpoint, params, config);
       } catch (e) {
         throw e;
       }
     },
-    async post() {
+    async POST() {
       try {
         return await axios.post<Response>(endpoint, params, config);
       } catch (e) {
         throw e;
       }
     },
-    async delete() {
+    async DELETE() {
       try {
         return await axios.delete<Response>(endpoint, { ...config, params });
       } catch (e) {

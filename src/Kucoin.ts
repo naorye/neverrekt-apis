@@ -11,21 +11,6 @@ export type KucoinParams = {
   isTest?: boolean;
 };
 
-function getSignature(
-  secret: string,
-  path: string,
-  queryString: string,
-  timestamp: string,
-  method: string
-): string {
-  const strForSign: string = `${timestamp}${method}${path}${queryString}`;
-  const signatureResult: string = crypto
-    .createHmac("sha256", secret)
-    .update(strForSign)
-    .digest("base64");
-  return signatureResult;
-}
-
 class Kucoin {
   private SECRET: string;
   private KEY: string;
@@ -50,53 +35,19 @@ class Kucoin {
     });
   }
 
-  /**
-   * @docs https://github.com/axios/axios
-   * @description You can intercept requests or responses before they are handled by then or catch.
-   */
-  // addRequestInterceptor(
-  //   onBeforeCallback: (
-  //     value: AxiosRequestConfig
-  //   ) => AxiosRequestConfig | Promise<AxiosRequestConfig>,
-  //   onErrorCallback: (error: AxiosError) => AxiosError | Promise<AxiosError>
-  // ): any {
-  //   return this.axios.interceptors.request.use(
-  //     onBeforeCallback,
-  //     onErrorCallback
-  //   );
-  // }
-
-  /**
-   * @docs https://github.com/axios/axios
-   * @description If you need to remove an interceptor later you can.
-   */
-  // removeRequestInterceptor(interceptor: any): void {
-  //   this.axios.interceptors.request.eject(interceptor);
-  // }
-
-  /**
-   * @docs https://github.com/axios/axios
-   * @description You can intercept requests or responses before they are handled by then or catch.
-   */
-  // addResponseInterceptor(
-  //   onSuccessCallback: (
-  //     response: AxiosResponse
-  //   ) => AxiosResponse | Promise<AxiosResponse>,
-  //   onErrorCallback: (error: AxiosError) => AxiosError | Promise<AxiosError>
-  // ): any {
-  //   return this.axios.interceptors.response.use(
-  //     onSuccessCallback,
-  //     onErrorCallback
-  //   );
-  // }
-
-  /**
-   * @docs https://github.com/axios/axios
-   * @description If you need to remove an interceptor later you can.
-   */
-  // removeResponseInterceptor(interceptor: any): void {
-  //   this.axios.interceptors.request.eject(interceptor);
-  // }
+  private getSignature(
+    path: string,
+    queryString: string,
+    timestamp: string,
+    method: string
+  ): string {
+    const strForSign: string = `${timestamp}${method}${path}${queryString}`;
+    const signatureResult: string = crypto
+      .createHmac("sha256", this.SECRET)
+      .update(strForSign)
+      .digest("base64");
+    return signatureResult;
+  }
 
   private async makeRequest<Response, Params extends object>(
     { type, method, endpoint, params }: NeverRekt.RequestArgs<Params>,
@@ -114,14 +65,13 @@ class Kucoin {
       if (type === "private") {
         const timestamp = `${Date.now()}`;
         const queryString =
-          method === "get" || method === "delete"
+          method === "GET" || method === "DELETE"
             ? createQueryString(params)
             : JSON.stringify(params);
         config = {
           headers: {
             "KC-API-TIMESTAMP": timestamp,
-            "KC-API-SIGN": getSignature(
-              this.SECRET,
+            "KC-API-SIGN": this.getSignature(
               path,
               queryString,
               timestamp,
@@ -168,7 +118,7 @@ class Kucoin {
           priceLimitRate: number;
         }[],
         typeof params
-      >({ method: "get", endpoint: "/symbols", params }, [{ key: "market" }]);
+      >({ method: "GET", endpoint: "/symbols", params }, [{ key: "market" }]);
     } catch (e) {
       throw e;
     }
@@ -192,7 +142,7 @@ class Kucoin {
           time: number;
         },
         typeof params
-      >({ method: "get", endpoint: "/market/orderbook/level1", params }, [
+      >({ method: "GET", endpoint: "/market/orderbook/level1", params }, [
         { key: "symbol", required: true },
       ]);
     } catch (e) {
@@ -224,7 +174,7 @@ class Kucoin {
           }[];
         },
         {}
-      >({ method: "get", endpoint: "/market/allTickers", params: {} });
+      >({ method: "GET", endpoint: "/market/allTickers", params: {} });
     } catch (e) {
       throw e;
     }
@@ -252,7 +202,7 @@ class Kucoin {
           changeRate: number;
         },
         typeof params
-      >({ method: "get", endpoint: "/market/stats", params }, [
+      >({ method: "GET", endpoint: "/market/stats", params }, [
         { key: "symbol", required: true },
       ]);
     } catch (e) {
@@ -271,7 +221,7 @@ class Kucoin {
           data: string[];
         },
         {}
-      >({ method: "get", endpoint: "/markets", params: {} });
+      >({ method: "GET", endpoint: "/markets", params: {} });
     } catch (e) {
       throw e;
     }
@@ -297,7 +247,7 @@ class Kucoin {
           isDebitEnabled: boolean;
         }[],
         {}
-      >({ method: "get", endpoint: "/currencies", params: {} });
+      >({ method: "GET", endpoint: "/currencies", params: {} });
     } catch (e) {
       throw e;
     }
@@ -323,7 +273,7 @@ class Kucoin {
           isDebitEnabled: boolean;
         },
         typeof params
-      >({ method: "get", endpoint: `/currencies/${currency}`, params }, [
+      >({ method: "GET", endpoint: `/currencies/${currency}`, params }, [
         { key: "chain" },
       ]);
     } catch (e) {
@@ -345,7 +295,7 @@ class Kucoin {
           };
         },
         typeof params
-      >({ method: "get", endpoint: "/prices", params }, [
+      >({ method: "GET", endpoint: "/prices", params }, [
         { key: "base" },
         { key: "currencies" },
       ]);
@@ -370,7 +320,7 @@ class Kucoin {
         typeof params
       >(
         {
-          method: "get",
+          method: "GET",
           endpoint: `/market/orderbook/level2_${level}`,
           params,
         },
@@ -395,7 +345,7 @@ class Kucoin {
           asks: number[][];
         },
         typeof params
-      >({ method: "get", endpoint: "/market/orderbook/level2", params }, [
+      >({ method: "GET", endpoint: "/market/orderbook/level2", params }, [
         { key: "symbol", required: true },
       ]);
     } catch (e) {
@@ -417,7 +367,7 @@ class Kucoin {
           asks: number[][];
         },
         typeof params
-      >({ method: "get", endpoint: "/market/orderbook/level3", params }, [
+      >({ method: "GET", endpoint: "/market/orderbook/level3", params }, [
         { key: "symbol", required: true },
       ]);
     } catch (e) {
@@ -440,7 +390,7 @@ class Kucoin {
           time: number;
         }[],
         typeof params
-      >({ method: "get", endpoint: "/market/histories", params }, [
+      >({ method: "GET", endpoint: "/market/histories", params }, [
         { key: "symbol", required: true },
       ]);
     } catch (e) {
@@ -473,7 +423,7 @@ class Kucoin {
   }) {
     try {
       return await this.makeRequest<number[][], typeof params>(
-        { method: "get", endpoint: "/market/candles", params },
+        { method: "GET", endpoint: "/market/candles", params },
         [
           { key: "symbol", required: true },
           { key: "startAt" },
@@ -499,7 +449,7 @@ class Kucoin {
           remarks: string;
         }[],
         {}
-      >({ type: "private", method: "get", endpoint: "/sub/user", params: {} });
+      >({ type: "private", method: "GET", endpoint: "/sub/user", params: {} });
     } catch (e) {
       throw e;
     }
@@ -519,7 +469,7 @@ class Kucoin {
           id: string;
         },
         typeof params
-      >({ type: "private", method: "post", endpoint: "/accounts", params }, [
+      >({ type: "private", method: "POST", endpoint: "/accounts", params }, [
         { key: "currency", required: true },
         { key: "type", required: true },
       ]);
@@ -552,7 +502,7 @@ class Kucoin {
           }[];
         },
         typeof params
-      >({ type: "private", method: "get", endpoint: "/accounts", params }, [
+      >({ type: "private", method: "GET", endpoint: "/accounts", params }, [
         { key: "currency" },
         { key: "type" },
       ]);
@@ -578,7 +528,7 @@ class Kucoin {
       >(
         {
           type: "private",
-          method: "get",
+          method: "GET",
           endpoint: `/accounts/${params.accountId}`,
           params,
         },
@@ -633,7 +583,7 @@ class Kucoin {
       >(
         {
           type: "private",
-          method: "get",
+          method: "GET",
           endpoint: `/accounts/${params.accountId}/ledgers`,
           params,
         },
@@ -675,7 +625,7 @@ class Kucoin {
       >(
         {
           type: "private",
-          method: "get",
+          method: "GET",
           endpoint: `/accounts/${params.accountId}/holds`,
           params,
         },
@@ -728,7 +678,7 @@ class Kucoin {
       >(
         {
           type: "private",
-          method: "get",
+          method: "GET",
           endpoint: `/sub-accounts/${params.subUserId}`,
           params,
         },
@@ -781,7 +731,7 @@ class Kucoin {
         {}
       >({
         type: "private",
-        method: "get",
+        method: "GET",
         endpoint: "/sub-accounts",
         params: {},
       });
@@ -811,7 +761,7 @@ class Kucoin {
       >(
         {
           type: "private",
-          method: "get",
+          method: "GET",
           endpoint: "/accounts/transferable",
           params,
         },
@@ -842,7 +792,7 @@ class Kucoin {
       return await this.makeRequest<{ orderId: string }, typeof params>(
         {
           type: "private",
-          method: "get",
+          method: "GET",
           endpoint: "/accounts/sub-transfer",
           params,
         },
@@ -881,7 +831,7 @@ class Kucoin {
       >(
         {
           type: "private",
-          method: "get",
+          method: "GET",
           endpoint: "/accounts/inner-transfer",
           params,
         },
@@ -914,7 +864,7 @@ class Kucoin {
       >(
         {
           type: "private",
-          method: "post",
+          method: "POST",
           endpoint: "/deposit-addresses",
           params,
         },
@@ -941,7 +891,7 @@ class Kucoin {
       >(
         {
           type: "private",
-          method: "get",
+          method: "GET",
           endpoint: "/deposit-addresses",
           params,
         },
@@ -984,7 +934,7 @@ class Kucoin {
           }[];
         },
         typeof params
-      >({ type: "private", method: "get", endpoint: "/deposits", params }, [
+      >({ type: "private", method: "GET", endpoint: "/deposits", params }, [
         { key: "currency" },
         { key: "startAt" },
         { key: "endAt" },
@@ -1023,7 +973,7 @@ class Kucoin {
         },
         typeof params
       >(
-        { type: "private", method: "get", endpoint: "/hist-deposits", params },
+        { type: "private", method: "GET", endpoint: "/hist-deposits", params },
         [
           { key: "currency" },
           { key: "startAt" },
@@ -1069,7 +1019,7 @@ class Kucoin {
           }[];
         },
         typeof params
-      >({ type: "private", method: "get", endpoint: "/withdrawals", params }, [
+      >({ type: "private", method: "GET", endpoint: "/withdrawals", params }, [
         { key: "currency" },
         { key: "startAt" },
         { key: "endAt" },
@@ -1113,7 +1063,7 @@ class Kucoin {
       >(
         {
           type: "private",
-          method: "get",
+          method: "GET",
           endpoint: "/hist-withdrawals",
           params,
         },
@@ -1156,7 +1106,7 @@ class Kucoin {
       >(
         {
           type: "private",
-          method: "get",
+          method: "GET",
           endpoint: "/withdrawals/quotas",
           params,
         },
@@ -1186,7 +1136,7 @@ class Kucoin {
           withdrawalId: string;
         },
         typeof params
-      >({ type: "private", method: "post", endpoint: "/withdrawals", params }, [
+      >({ type: "private", method: "POST", endpoint: "/withdrawals", params }, [
         { key: "currency", required: true },
         { key: "address", required: true },
         { key: "amount", required: true },
@@ -1208,7 +1158,7 @@ class Kucoin {
     try {
       return await this.makeRequest<{}, {}>({
         type: "private",
-        method: "delete",
+        method: "DELETE",
         endpoint: `/withdrawals/${params.withdrawalId}`,
         params: {},
       });
@@ -1247,7 +1197,7 @@ class Kucoin {
           orderId: string;
         },
         typeof params
-      >({ type: "private", method: "post", endpoint: "/orders", params }, [
+      >({ type: "private", method: "POST", endpoint: "/orders", params }, [
         { key: "clientOid", required: true },
         { key: "side", required: true },
         { key: "symbol", required: true },
@@ -1289,7 +1239,7 @@ class Kucoin {
       >(
         {
           type: "private",
-          method: "delete",
+          method: "DELETE",
           endpoint: `/orders/${params.orderId}`,
           params,
         },
@@ -1314,7 +1264,7 @@ class Kucoin {
           cancelledOrderIds: string[];
         },
         typeof params
-      >({ type: "private", method: "delete", endpoint: "/orders", params }, [
+      >({ type: "private", method: "DELETE", endpoint: "/orders", params }, [
         { key: "symbol" },
         { key: "tradeType" },
       ]);
@@ -1377,7 +1327,7 @@ class Kucoin {
           }[];
         },
         typeof params
-      >({ type: "private", method: "get", endpoint: "/orders", params }, [
+      >({ type: "private", method: "GET", endpoint: "/orders", params }, [
         { key: "status" },
         { key: "symbol" },
         { key: "side" },
@@ -1421,7 +1371,7 @@ class Kucoin {
           }[];
         },
         typeof params
-      >({ type: "private", method: "get", endpoint: "/hist-orders", params }, [
+      >({ type: "private", method: "GET", endpoint: "/hist-orders", params }, [
         { key: "currentPage" },
         { key: "pageSize" },
         { key: "symbol" },
@@ -1482,7 +1432,7 @@ class Kucoin {
         {}
       >({
         type: "private",
-        method: "get",
+        method: "GET",
         endpoint: "/limit/orders",
         params: {},
       });
@@ -1533,7 +1483,7 @@ class Kucoin {
         {}
       >({
         type: "private",
-        method: "get",
+        method: "GET",
         endpoint: `/orders/${params.orderId}`,
         params: {},
       });
@@ -1583,7 +1533,7 @@ class Kucoin {
           }[];
         },
         typeof params
-      >({ type: "private", method: "get", endpoint: "/fills", params }, [
+      >({ type: "private", method: "GET", endpoint: "/fills", params }, [
         { key: "orderId" },
         { key: "symbol" },
         { key: "side" },
@@ -1629,7 +1579,7 @@ class Kucoin {
         {}
       >({
         type: "private",
-        method: "get",
+        method: "GET",
         endpoint: "/limit/fills",
         params: {},
       });
@@ -1654,7 +1604,7 @@ class Kucoin {
         {}
       >({
         type: "private",
-        method: "get",
+        method: "GET",
         endpoint: `/mark-price/${params.symbol}/current`,
         params: {},
       });
@@ -1679,7 +1629,7 @@ class Kucoin {
         {}
       >({
         type: "private",
-        method: "get",
+        method: "GET",
         endpoint: "/margin/config",
         params: {},
       });
@@ -1709,7 +1659,7 @@ class Kucoin {
         {}
       >({
         type: "private",
-        method: "get",
+        method: "GET",
         endpoint: "/margin/account",
         params: {},
       });
@@ -1737,7 +1687,7 @@ class Kucoin {
         },
         typeof params
       >(
-        { type: "private", method: "post", endpoint: "/margin/borrow", params },
+        { type: "private", method: "POST", endpoint: "/margin/borrow", params },
         [
           { key: "currency", required: true },
           { key: "type", required: true },
@@ -1775,7 +1725,7 @@ class Kucoin {
         },
         typeof params
       >(
-        { type: "private", method: "get", endpoint: "/margin/borrow", params },
+        { type: "private", method: "GET", endpoint: "/margin/borrow", params },
         [{ key: "orderId", required: true }]
       );
     } catch (e) {
@@ -1812,7 +1762,7 @@ class Kucoin {
       >(
         {
           type: "private",
-          method: "get",
+          method: "GET",
           endpoint: "/margin/borrow/outstanding",
           params,
         },
@@ -1850,7 +1800,7 @@ class Kucoin {
       >(
         {
           type: "private",
-          method: "get",
+          method: "GET",
           endpoint: "/margin/borrow/repaid",
           params,
         },
@@ -1874,7 +1824,7 @@ class Kucoin {
       return await this.makeRequest<{}, typeof params>(
         {
           type: "private",
-          method: "post",
+          method: "POST",
           endpoint: "/margin/repay/all",
           params,
         },
@@ -1902,7 +1852,7 @@ class Kucoin {
       return await this.makeRequest<{}, typeof params>(
         {
           type: "private",
-          method: "post",
+          method: "POST",
           endpoint: "/margin/repay/single",
           params,
         },
@@ -1936,7 +1886,7 @@ class Kucoin {
       >(
         {
           type: "private",
-          method: "get",
+          method: "GET",
           endpoint: "/margin/trade/last",
           params,
         },
@@ -1960,7 +1910,7 @@ class Kucoin {
           data: number;
         },
         {}
-      >({ method: "get", endpoint: "/timestamp", params: {} });
+      >({ method: "GET", endpoint: "/timestamp", params: {} });
     } catch (e) {
       throw e;
     }

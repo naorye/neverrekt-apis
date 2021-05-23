@@ -1,6 +1,6 @@
 {
   "name": "neverrekt-apis",
-  "version": "0.0.0-beta3",
+  "version": "0.0.0-beta4",
   "description": "APIs for NeverRekt",
   "main": "dist/index.js",
   "scripts": {

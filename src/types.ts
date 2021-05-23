@@ -1,5 +1,5 @@
 export namespace NeverRekt {
-  export type Method = "get" | "post" | "put" | "delete";
+  export type Method = "GET" | "POST" | "PUT" | "DELETE";
 
   export type ParametersMap = {
     key: string;
