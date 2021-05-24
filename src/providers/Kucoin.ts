@@ -1,8 +1,8 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import * as crypto from "crypto";
-import { NeverRekt } from "./types";
-import { api } from "./api";
-import { checkParameters, createQueryString } from "./utils";
+import { NeverRekt } from "../types";
+import { api } from "../api";
+import { checkParameters, createQueryString } from "../utils";
 
 export type KucoinParams = {
   SECRET: string;
