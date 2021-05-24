@@ -121,7 +121,7 @@ class Mxc {
             time: number;
             change_rate: string;
           }[];
-        }[],
+        },
         typeof params
       >({ method: "GET", endpoint: "/open/api/v2/market/ticker", params }, [
         { key: "symbol" },
