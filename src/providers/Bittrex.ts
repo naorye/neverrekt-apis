@@ -155,7 +155,7 @@ class Bittrex {
           lastTradeRate: number;
           bidRate: number;
           askRate: number;
-        },
+        }[],
         {}
       >({
         method: "GET",
