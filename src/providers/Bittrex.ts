@@ -9,7 +9,7 @@ import { checkParameters, createQueryString } from "../utils";
 export type BittrexParams = {
   SECRET: string;
   KEY: string;
-  SIGNATURE: string;
+  SUBACCOUNT: string;
 };
 
 //Bittrex required headers
