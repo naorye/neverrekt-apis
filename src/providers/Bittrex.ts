@@ -26,10 +26,10 @@ class Bittrex {
   private axios: AxiosInstance;
   public prefix: string;
 
-  constructor(SECRET: string, KEY: string, SUBACCOUNT: string = "") {
+  constructor(SECRET: string, KEY: string) {
     this.SECRET = SECRET;
     this.KEY = KEY;
-    this.SUBACCOUNT = SUBACCOUNT;
+    this.SUBACCOUNT = "";
     this.prefix = "/v3";
     this.axios = axios.create({
       baseURL: "https://api.bittrex.com",
@@ -87,7 +87,7 @@ class Bittrex {
               path,
               timestamp,
               contentHash,
-              "",
+              this.SUBACCOUNT,
               method
             ),
             "Api-Content-Hash": contentHash,
@@ -104,13 +104,15 @@ class Bittrex {
           };
         }
       }
-      return await api<Response, Params>(
+      const response = await api<Response, Params>(
         this.axios,
         method,
         path,
         params,
         config
       );
+
+      return response;
     } catch (e) {
       throw e;
     }
@@ -120,9 +122,9 @@ class Bittrex {
    * @docs https://bittrex.github.io/api/v3#operation--markets-get
    * @description Request via this endpoint to get a list of available currency pairs for trading.
    */
-  async getMarketList(params: { market?: string } = {}) {
+  public async getMarketList() {
     try {
-      return await this.makeRequest<
+      const response = await this.makeRequest<
         {
           symbol: string;
           baseCurrencySymbol: string;
@@ -133,11 +135,13 @@ class Bittrex {
           createdAt: string;
           notice: string;
           prohibitedIn: string;
-          associatedTermsOfService: ["string"];
-          tags: ["string"];
+          associatedTermsOfService: string[];
+          tags: string[];
         }[],
-        typeof params
+        {}
       >({ method: "GET", endpoint: "/markets", params: {} });
+
+      return response;
     } catch (e) {
       throw e;
     }
@@ -147,9 +151,9 @@ class Bittrex {
    * @docs https://bittrex.github.io/api/v3#operation--markets-tickers-get
    * @description Request market tickers for all the trading pairs in the market (including 24h volume)
    */
-  async getTickerAll() {
+  public async getTickerInformation() {
     try {
-      return await this.makeRequest<
+      const response = await this.makeRequest<
         {
           symbol: string;
           lastTradeRate: number;
@@ -162,6 +166,8 @@ class Bittrex {
         endpoint: "/markets/tickers",
         params: {},
       });
+
+      return response;
     } catch (e) {
       throw e;
     }
@@ -172,9 +178,9 @@ class Bittrex {
    * @description Request all currencies supported
    */
 
-  async getCurrencies() {
+  public async getCurrencies() {
     try {
-      return await this.makeRequest<
+      const response = await this.makeRequest<
         {
           symbol: string;
           name: string;
@@ -195,6 +201,8 @@ class Bittrex {
         endpoint: "/currencies",
         params: {},
       });
+
+      return response;
     } catch (e) {
       throw e;
     }
@@ -205,9 +213,9 @@ class Bittrex {
    * @description Get account balances
    */
 
-  async getBalances() {
+  public async getBalances() {
     try {
-      return await this.makeRequest<
+      const response = await this.makeRequest<
         {
           currencySymbol: string;
           total: number;
@@ -221,6 +229,7 @@ class Bittrex {
         endpoint: "/balances",
         params: {},
       });
+      return response;
     } catch (e) {
       throw e;
     }
