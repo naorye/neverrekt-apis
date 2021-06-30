@@ -156,7 +156,7 @@ class Bittrex {
       const response = await this.makeRequest<
         {
           symbol: string;
-          lastTradeRate: number;
+          lastTradeRate: string;
           bidRate: number;
           askRate: number;
         }[],
