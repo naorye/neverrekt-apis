@@ -4,8 +4,6 @@ import { NeverRekt } from "../types";
 import { api } from "../api";
 import { checkParameters, createQueryString } from "../utils";
 
-//ethbtc [basesymbol:eth][quote symbol:btc]
-
 export type BittrexParams = {
   SECRET: string;
   KEY: string;
